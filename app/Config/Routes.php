@@ -11,7 +11,7 @@ $routes = Services::routes();
  * --------------------------------------------------------------------
  */
 $routes->setDefaultNamespace('App\Controllers');
-$routes->setDefaultController('Home');
+$routes->setDefaultController('User');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
 $routes->set404Override();
@@ -29,7 +29,23 @@ $routes->set404Override();
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->get('/', 'Home::index');
+$routes->get('/', 'User::index');
+$routes->post('login/validate_credentials', 'User::validate_credentials');
+$routes->get('welcome', 'User::admin_welcome');
+
+// sidebar
+$routes->get('admin/customer', 'Customer::index');
+// $routes->get('admin/customer/add', 'Customer::add');
+$routes->match(['get', 'post'], 'admin/customer/edit/(:num)', 'Customer::update/$1');
+$routes->match(['get', 'post'], 'admin/customer/info/(:any)', 'Customer::info');
+$routes->get('admin/customer/total_partners/(:any)', 'Customer::total_partners');
+$routes->get('admin/customer/total_purchase/(:any)', 'Customer::total_purchase');
+$routes->get('admin/micro', 'Customer::micro');
+$routes->get('admin/macro', 'Customer::macro');
+$routes->get('admin/mega', 'Customer::mega');
+$routes->get('admin/customer/partners_master', 'Customer::partners_master');
+$routes->get('admin/customer/purchase_master', 'Customer::purchase_master');
+$routes->match(['get', 'post'],'admin/update_user', 'Customer::update_user');
 
 /*
  * --------------------------------------------------------------------

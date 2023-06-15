@@ -1,0 +1,74 @@
+@import url(../bootstrap/css/bootstrap.min.css);
+@import url(admin.css);
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body {font-family: 'Open Sans', sans-serif;color:#000; background: #eee;
+height: 594px;}
+body a{color:#003455;outline:none;}
+.flr{float:right;}
+.flt{float:left;}
+
+.main-left{background:#eff1f6 none repeat scroll 0 0;}
+.main-left h4 {
+    background: #00abed none repeat scroll 0 0;
+    font-size: 16px;color:#fff;
+    font-weight: bold; padding: 10px 17px;
+}
+.main-right{}
+.main-left ul{padding-left:32px;}
+.main-left ul ul{padding-left:15px;}
+.img-field{clear:both;width: 358px;}
+.img-field input{padding:0px;width:200px;}
+.img-field img{float:right;margin:0 0 5px 5px;}
+
+a.logout{ color: #fff;font-weight: bold;margin: 32px 0 0 14px;}
+a.logout:hover{ color: #fff;text-decoration:underline;}
+
+.page-heading h2{padding-bottom:10px;}
+th small a { font-size: 10px;}
+.table-bordered td strong{font-size:12px;}
+.btn-primary {
+    background-color: #F97E76;
+    border-color: #F97E76;
+}
+table tr.even{/*background:#eee;*/}
+table tr.pending{background:#f86c6c;font-size:13px;}
+.main-left li {    padding: 4px 0;}
+
+.table-bordered tr.sperater td{padding:2px;}
+.table-bordered tr td{font-size:13px;}
+.table-bordered tr td{padding:2px 8px !important;vertical-align:middle !important;}
+thead tr  th.checkbox{width:115px;}
+.member-table tr td{padding:8px !important;}
+
+.navi{text-align:left;}
+.navigation{padding:0px;margin-top:40px;}
+.navigation li{list-style:none;display:inline-block;}
+.navigation li a{color:#003759;padding:10px;font-weight:bold;font-size:18px;}
+.container.top{margin-top:0px;}
+.select-part a.btn{margin-right:20px;}
+.select-part{float:right;width:70%;text-align:right;}
+
+.panel-title > a{display:block;}
+
+
+@media screen and (max-width:767px)
+{
+ .logo{text-align:center;width:100%;}
+.navi{text-align:center;width:100%;}
+.navigation {margin:11px 0px 20px;}
+.navigation li a{padding:6px 10px;display:inline-block;}
+.select-part .form-control{width:40%;display:inline-block;}
+}
+
+@media screen and (max-width:480px)
+{
+
+.select-part{width:100%;float:left;margin-bottom:20px;}
+}
+@media screen and (max-width:414px)
+{
+.select-part a.btn{display:block;margin-bottom:20px;}
+.select-part .form-control{width:70%;}
+}
