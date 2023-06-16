@@ -267,7 +267,7 @@ class Customer extends BaseController
         $data['page_description'] = '';
         $data['page_slug'] = 'Update User';
         $data['page_title'] = 'Update User';
-        $Usersmodel=model('Users_model');
+        $Usersmodel = model('Users_model');
         if ($this->request->getMethod() === 'post' && $this->request->getPost('find_customer') !== null) {
             $validationRules = [
                 'assign_to' => 'required|trim'
@@ -289,7 +289,8 @@ class Customer extends BaseController
                 }
             }
 
-            if (empty($this->validator->getErrors())) {                        }
+            if (empty($this->validator->getErrors())) {
+            }
         } elseif ($this->request->getMethod() === 'post') {
             $validationRules = [
                 'assign_to' => 'required|trim',
@@ -500,7 +501,7 @@ class Customer extends BaseController
                     $return = TRUE;
                 }
                 /**************** end payment distribution *******************/
-                $session=session();
+                $session = session();
                 if ($return === TRUE) {
                     $session->setFlashdata('flash_message', 'activated');
                     return redirect()->to(base_url('admin/update_user'));
@@ -512,6 +513,63 @@ class Customer extends BaseController
         }
 
         $data['main_content'] = 'admin/update_user';
+        return view('includes/admin/template', $data);
+    }
+
+    public function update_customer()
+    {
+        $data['main_content'] = 'admin/update_customer';
+
+        $request = \Config\Services::request();
+        $db = db_connect();
+        $query = $db->query('
+        SELECT c.id, customer_id, f_name, l_name, role, booking_packages_number, SUM(amount) as booking_amount
+        FROM customer c LEFT JOIN installment i
+        ON c.id = i.user_id
+        WHERE c.status = "hold" and i.installment_no = 1
+        GROUP BY id, customer_id, f_name, l_name, role, booking_packages_number;
+        ');
+        $row = $query->getResult();
+        $data['customers'] = $row;
+
+        //Total amount to pay
+
+        if ($request->is('post')) {
+            $user_id = $request->getVar('id');
+            $customer_id = $request->getVar('customer_id');
+            $booking_amount = $request->getVar('booking_amount');
+            $update_installment_query = '
+            UPDATE installment
+            SET status = "Paid" 
+            WHERE user_id = ' . $user_id . ' and installment_no = 1;
+            ';
+            if ($db->query($update_installment_query)) {
+                //distribution starts here
+                $query = $db->query('select parent_customer_id, role, booking_packages_number from customer where id = ' . $user_id);
+                $row = $query->getRow();
+                $parent_customer_id = $row->parent_customer_id;
+                $booking_packages_number = $row->booking_packages_number;
+                $amount = (1100 * $booking_packages_number) / 2;
+                $add_income__query = 'insert into incomes (user_id, amount, type, user_send_by, pay_type, dist_level, status) values ("' . $parent_customer_id . '", ' . $amount . ', "Level Income", ' . $user_id . ', "travmoney", 1, "Approved");';
+                $db->query($add_income__query);
+                $add_income__query = 'insert into incomes (user_id, amount, type, user_send_by, pay_type, dist_level, status) values ("' . $parent_customer_id . '", ' . $amount . ', "Level Income", ' . $user_id . ', "travprofit", 1, "Approved");';
+                $db->query($add_income__query);
+                for ($i = 2; $i <= 5; $i++) {
+                    $query = $db->query('select parent_customer_id, role, booking_packages_number from customer where customer_id = "' . $parent_customer_id . '"');
+                    $row = $query->getRow();
+                    $parent_customer_id = $row->parent_customer_id;
+                    $booking_packages_number = $row->booking_packages_number;
+                    $amount = 1100 / 2;
+                    $add_income__query = 'insert into incomes (user_id, amount, type, user_send_by, pay_type, dist_level, status) values ("' . $parent_customer_id . '", ' . $amount . ', "Level Income", ' . $user_id . ', "travmoney", ' . $i . ', "Approved");';
+                    $db->query($add_income__query);
+                    $add_income__query = 'insert into incomes (user_id, amount, type, user_send_by, pay_type, dist_level, status) values ("' . $parent_customer_id . '", ' . $amount . ', "Level Income", ' . $user_id . ', "travprofit", ' . $i . ', "Approved");';
+                    $db->query($add_income__query);
+                }
+                $db->query('update customer set status = "active" where id = ' . $user_id);
+            } else {
+                echo 'Installment no updated!';
+            }
+        }
         return view('includes/admin/template', $data);
     }
 }

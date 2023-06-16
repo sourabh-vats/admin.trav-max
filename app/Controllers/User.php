@@ -22,7 +22,7 @@ class User extends BaseController
         $userModel = model('Users_Model');
         $is_valid = $userModel->validates($user_name, $password);
 
-        if ($is_valid['login'] == 'true') {
+        if (isset($is_valid['login']) && $is_valid['login'] == 'true') {
             $data = array('user_name' => $user_name, 'permission' => $is_valid['permission'], 'full_name' => $is_valid['full_name'], 'email' => $is_valid['email'], 'role' => $is_valid['user_level'], 'user_id' => $is_valid['user_id'], 'is_admin_logged_in' => true);
             session()->set($data);
             return redirect()->to(base_url('welcome'));

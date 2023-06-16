@@ -47,6 +47,8 @@ $routes->get('admin/customer/partners_master', 'Customer::partners_master');
 $routes->get('admin/customer/purchase_master', 'Customer::purchase_master');
 $routes->match(['get', 'post'],'admin/update_user', 'Customer::update_user');
 
+$routes->match(['get', 'post'],'update_customer', 'Customer::update_customer');
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
