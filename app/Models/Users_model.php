@@ -8,6 +8,8 @@ class Users_model extends Model
     function validates($user_name, $password)
     {
         $db = \Config\Database::connect();
+        echo $user_name;
+        die();
         $query = $db->table('membership')
             ->select('*')
             ->where('user_name', $user_name)
