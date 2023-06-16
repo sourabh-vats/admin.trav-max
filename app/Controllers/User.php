@@ -19,7 +19,7 @@ class User extends BaseController
 
         $user_name = $this->request->getpost('user_name');
         $password = $this->__encrip_password($this->request->getpost('password'));
-        $userModel = model('Users_Model');
+        $userModel = model('Users_model');
         $is_valid = $userModel->validates($user_name, $password);
 
         if (isset($is_valid['login']) && $is_valid['login'] == 'true') {
