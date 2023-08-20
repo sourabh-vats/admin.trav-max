@@ -24,7 +24,16 @@ $(document).ready(function() {
 } );
  
   </script>
-  
+  <script>
+    $(function() {
+        // Initialize the datepicker
+        $('.datepicker').datepicker({
+            dateFormat: 'dd-mm-yy', // Format of the selected date
+            // Other options as needed
+        });
+    });
+</script>
+
 <!--<script src="<?php echo base_url(); ?>assets/js/lsb.min.js"></script>
 <script>
 	jQuery(window).load(function() {

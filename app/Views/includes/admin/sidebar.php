@@ -3,6 +3,8 @@
    <ul>
      <li class="dropdown"><a class="dropdown-toggle active" href="<?php echo base_url(); ?>welcome">Dashboard</a></li>
      <li class="dropdown"><a href="<?php echo base_url(); ?>admin/customer">Customer</a></li>
+     <li class="dropdown"><a href="<?php echo base_url(); ?>admin/purchase">Purchase</a></li>
+     <li class="dropdown"><a href="<?php echo base_url(); ?>admin/purchases">View Purchases</a></li>
      <li class="dropdown"><a href="<?php echo base_url(); ?>admin/update_user">Update User</a></li>
 
      <li class="dropdown ">

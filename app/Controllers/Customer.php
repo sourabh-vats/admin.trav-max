@@ -572,4 +572,51 @@ class Customer extends BaseController
         }
         return view('includes/admin/template', $data);
     }
+
+
+    public function purchase()
+    {
+        $data['title'] = 'Purchase';
+        if ($this->request->getMethod() === 'post') {
+            $data = [
+                'trav_id' => $this->request->getPost('trav_id'),
+                'purchase_type' => $this->request->getPost('purchase_type'),
+                'amount' => $this->request->getPost('amount'),
+                'purchase_date' => $this->request->getPost('purchase_date'),
+                'payment_mode' => $this->request->getPost('payment_mode'),
+                'invoice' => $this->request->getPost('invoice'),
+                'cashback' => $this->request->getPost('cashback'),
+            ];
+
+            // Upload file and get the file name
+            $document = $this->request->getFile('document');
+            if ($document->isValid() && !$document->hasMoved()) {
+                $newName = $document->getRandomName();
+                $document->move(ROOTPATH . 'public/uploads', $newName);
+                $data['document'] = $newName;
+            }
+
+            // Insert data into database using model
+            $user_model = model('Users_model');
+            $user_model->add_purchase($data);
+
+            // Redirect or display success message
+            return redirect()->to(base_url('admin/purchase'))->with('success', 'Purchase added successfully');
+        }
+        //load the view
+        $data['main_content'] = 'admin/purchase';
+        return view('includes/admin/template', $data);
+    }
+
+    public function purchases()
+    {
+        $data['title'] = 'Purchases';
+        $user_model = model('Users_model');
+        $purchases = $user_model->get_purchase_data(); 
+    
+        $data['purchases'] = $purchases;
+        //load the view
+        $data['main_content'] = 'admin/purchases';
+        return view('includes/admin/template', $data);
+    }
 }
