@@ -92,10 +92,10 @@ class Users_model extends Model
         $db = \Config\Database::connect();
         $builder = $db->table('transaction_wallet');
         $builder->insert($data);
-    
+
         return $builder->insertGetID();
     }
-    
+
     public function add_purchases($data)
     {
         $db = \Config\Database::connect();
@@ -118,16 +118,33 @@ class Users_model extends Model
         $db->table('installment')->insert($data);
         return $this->db->affectedRows() > 0;
     }
-    function distribution(){
-		echo 'distribution starts here';
-	}
+    function distribution()
+    {
+        echo 'distribution starts here';
+    }
     public function parent_profile($blissid)
-{
-    $db = \Config\Database::connect();
-    return $db->table('customer')
-        ->where('customer_id', $blissid)
-        ->get()
-        ->getResultArray();
-}
+    {
+        $db = \Config\Database::connect();
+        return $db->table('customer')
+            ->where('customer_id', $blissid)
+            ->get()
+            ->getResultArray();
+    }
+    public function add_purchase($data)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('admin_purchases');
+        $builder->insert($data);
+    }
 
+    public function get_purchase_data()
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('admin_purchases');
+        $builder->select('*');
+
+        $query = $builder->get();
+
+        return $query->getResultArray();
+    }
 }
