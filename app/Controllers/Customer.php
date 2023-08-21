@@ -577,8 +577,7 @@ class Customer extends BaseController
     public function purchase()
     {
         $data['title'] = 'Purchase';
-        print_r($data);
-        die();
+        print_r($this->request->getMethod());
         if ($this->request->getMethod() === 'post') {
             $data = [
                 'trav_id' => $this->request->getPost('trav_id'),
