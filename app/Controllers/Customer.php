@@ -587,7 +587,8 @@ class Customer extends BaseController
                 'invoice' => $this->request->getPost('invoice'),
                 'cashback' => $this->request->getPost('cashback'),
             ];
-
+            print_r($data);
+            die();
             // Upload file and get the file name
             $document = $this->request->getFile('document');
             if ($document->isValid() && !$document->hasMoved()) {
