@@ -135,6 +135,8 @@ class Users_model extends Model
         $db = \Config\Database::connect();
         $builder = $db->table('admin_purchases');
         $builder->insert($data);
+
+        return true;
     }
 
     public function get_purchase_data()

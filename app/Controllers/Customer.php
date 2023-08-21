@@ -598,7 +598,33 @@ class Customer extends BaseController
 
             // Insert data into database using model
             $user_model = model('Users_model');
-            $user_model->add_purchase($data);
+            $purchase_added = $user_model->add_purchase($data);
+
+            if ($purchase_added) {
+                $db = db_connect();
+                $user_id = $this->request->getPost('trav_id');
+                $purchase_amount = $this->request->getPost('amount');
+                $cashback = $this->request->getPost('cashback');
+                $user_cashback = $cashback * 0.40;
+                $parent_moneyback = $cashback * 0.05;
+                //user wallet updates
+                $db->query("UPDATE `wallet` SET `eligibility` = `eligibility` + '$purchase_amount' WHERE (`user_id` = '$user_id' and `wallet_type` = 'moneyback')");
+                $db->query("UPDATE `wallet` SET `balance` = `balance` + '$user_cashback' WHERE (`user_id` = '$user_id' and `wallet_type` = 'cashback')");
+                $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$user_id', (select wallet_id from wallet where user_id='$user_id' and wallet_type = 'cashback'), '$user_cashback', 'credit')");
+                //distribution
+                $parent_id = $user_id;//temparary
+                for ($i = 0; $i < 5; $i++) {
+                    $query   = $db->query('select parent_customer_id from customer where customer_id = "' . $parent_id . '"');
+                    $result = $query->getRowArray();
+                    if ($result) {
+                        $parent_id = $result['parent_customer_id'];
+                        $db->query("UPDATE `wallet` SET `balance` = `balance` + '$parent_moneyback' WHERE (`user_id` = '$parent_id' and `wallet_type` = 'moneyback')");
+                        $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$parent_id', (select wallet_id from wallet where user_id='$parent_id' and wallet_type = 'moneyback'), '$parent_moneyback', 'credit')");
+                    }else {
+                        exit();
+                    }    
+                }
+            }
 
             // Redirect or display success message
             return redirect()->to(base_url('admin/purchase'))->with('success', 'Purchase added successfully');
@@ -612,8 +638,8 @@ class Customer extends BaseController
     {
         $data['title'] = 'Purchases';
         $user_model = model('Users_model');
-        $purchases = $user_model->get_purchase_data(); 
-    
+        $purchases = $user_model->get_purchase_data();
+
         $data['purchases'] = $purchases;
         //load the view
         $data['main_content'] = 'admin/purchases';

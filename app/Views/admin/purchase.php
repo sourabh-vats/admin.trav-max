@@ -78,11 +78,9 @@ echo form_open(base_url().'admin/purchase/' . $uri->getSegment(3), $attributes);
         </div>
         <div class="form-group">
             <label>Cashback (Between 100 and 1000):</label>
-            <?php
-            echo form_input('cashback', '', 'placeholder="" class="form-control"');
-            ?>
+            <input type="number" class="form-control" name="cashback">
         </div>
-        <div class="form-group">
+        <div class="form-group mt-3">
             <?php
             echo form_submit('submit', 'Submit', 'class="btn btn-primary"');
             ?>
