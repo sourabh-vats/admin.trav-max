@@ -577,8 +577,7 @@ class Customer extends BaseController
     public function purchase()
     {
         $data['title'] = 'Purchase';
-        print_r($this->request->getMethod());
-        die();
+        
         if ($this->request->getMethod() === 'post') {
             $data = [
                 'trav_id' => $this->request->getPost('trav_id'),
@@ -632,6 +631,8 @@ class Customer extends BaseController
             // Redirect or display success message
             return redirect()->to(base_url('admin/purchase'))->with('success', 'Purchase added successfully');
         }
+        print_r($this->request->getMethod());
+        die();
         //load the view
         $data['main_content'] = 'admin/purchase';
         return view('includes/admin/template', $data);
