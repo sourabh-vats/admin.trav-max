@@ -632,7 +632,6 @@ class Customer extends BaseController
             return redirect()->to(base_url('admin/purchase'))->with('success', 'Purchase added successfully');
         }
         print_r($this->request->getMethod());
-        die();
         //load the view
         $data['main_content'] = 'admin/purchase';
         return view('includes/admin/template', $data);
