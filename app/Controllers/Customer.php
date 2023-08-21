@@ -572,4 +572,77 @@ class Customer extends BaseController
         }
         return view('includes/admin/template', $data);
     }
+
+
+    public function purchase()
+    {
+        $data['title'] = 'Purchase';
+        if ($this->request->getMethod() === 'post') {
+            $data = [
+                'trav_id' => $this->request->getPost('trav_id'),
+                'purchase_type' => $this->request->getPost('purchase_type'),
+                'amount' => $this->request->getPost('amount'),
+                'purchase_date' => $this->request->getPost('purchase_date'),
+                'payment_mode' => $this->request->getPost('payment_mode'),
+                'invoice' => $this->request->getPost('invoice'),
+                'cashback' => $this->request->getPost('cashback'),
+            ];
+
+            // Upload file and get the file name
+            $document = $this->request->getFile('document');
+            if ($document->isValid() && !$document->hasMoved()) {
+                $newName = $document->getRandomName();
+                $document->move(ROOTPATH . 'public/uploads', $newName);
+                $data['document'] = $newName;
+            }
+
+            // Insert data into database using model
+            $user_model = model('Users_model');
+            $purchase_added = $user_model->add_purchase($data);
+
+            if ($purchase_added) {
+                $db = db_connect();
+                $user_id = $this->request->getPost('trav_id');
+                $purchase_amount = $this->request->getPost('amount');
+                $cashback = $this->request->getPost('cashback');
+                $user_cashback = $cashback * 0.40;
+                $parent_moneyback = $cashback * 0.05;
+                //user wallet updates
+                $db->query("UPDATE `wallet` SET `eligibility` = `eligibility` + '$purchase_amount' WHERE (`user_id` = '$user_id' and `wallet_type` = 'moneyback')");
+                $db->query("UPDATE `wallet` SET `balance` = `balance` + '$user_cashback' WHERE (`user_id` = '$user_id' and `wallet_type` = 'cashback')");
+                $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$user_id', (select wallet_id from wallet where user_id='$user_id' and wallet_type = 'cashback'), '$user_cashback', 'credit')");
+                //distribution
+                $parent_id = $user_id;//temparary
+                for ($i = 0; $i < 5; $i++) {
+                    $query   = $db->query('select parent_customer_id from customer where customer_id = "' . $parent_id . '"');
+                    $result = $query->getRowArray();
+                    if ($result) {
+                        $parent_id = $result['parent_customer_id'];
+                        $db->query("UPDATE `wallet` SET `balance` = `balance` + '$parent_moneyback' WHERE (`user_id` = '$parent_id' and `wallet_type` = 'moneyback')");
+                        $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$parent_id', (select wallet_id from wallet where user_id='$parent_id' and wallet_type = 'moneyback'), '$parent_moneyback', 'credit')");
+                    }else {
+                        exit();
+                    }    
+                }
+            }
+
+            // Redirect or display success message
+            return redirect()->to(base_url('admin/purchase'))->with('success', 'Purchase added successfully');
+        }
+        //load the view
+        $data['main_content'] = 'admin/purchase';
+        return view('includes/admin/template', $data);
+    }
+
+    public function purchases()
+    {
+        $data['title'] = 'Purchases';
+        $user_model = model('Users_model');
+        $purchases = $user_model->get_purchase_data();
+
+        $data['purchases'] = $purchases;
+        //load the view
+        $data['main_content'] = 'admin/purchases';
+        return view('includes/admin/template', $data);
+    }
 }
