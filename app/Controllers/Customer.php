@@ -579,8 +579,6 @@ class Customer extends BaseController
         $data['title'] = 'Purchase';
         
         if ($this->request->getMethod() === 'post') {
-            echo 'hi';
-            die();
             $data = [
                 'trav_id' => $this->request->getPost('trav_id'),
                 'purchase_type' => $this->request->getPost('purchase_type'),
