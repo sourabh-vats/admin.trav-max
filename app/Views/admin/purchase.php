@@ -13,7 +13,7 @@ $uri = service('uri');
 <?php
 // form data
 $attributes = array('class' => 'form', 'id' => '', 'enctype' => 'multipart/form-data');
-echo form_open(base_url().'admin/purchase/' . $uri->getSegment(3), $attributes);
+echo form_open('/admin/purchase', $attributes);
 
 ?>
 
