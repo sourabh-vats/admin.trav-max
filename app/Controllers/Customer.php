@@ -588,8 +588,6 @@ class Customer extends BaseController
                 'invoice' => $this->request->getPost('invoice'),
                 'cashback' => $this->request->getPost('cashback'),
             ];
-            print_r($data);
-            die();
             // Upload file and get the file name
             $document = $this->request->getFile('document');
             if ($document->isValid() && !$document->hasMoved()) {
@@ -621,7 +619,12 @@ class Customer extends BaseController
                     if ($result) {
                         $parent_id = $result['parent_customer_id'];
                         $db->query("UPDATE `wallet` SET `balance` = `balance` + '$parent_moneyback' WHERE (`user_id` = '$parent_id' and `wallet_type` = 'moneyback')");
-                        $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$parent_id', (select wallet_id from wallet where user_id='$parent_id' and wallet_type = 'moneyback'), '$parent_moneyback', 'credit')");
+                        $query = $db->query("select wallet_id from wallet where user_id='$parent_id' and wallet_type = 'moneyback'");
+                        $result = $query->getRowArray();
+                        if ($result) {
+                            $wallet_id = $result['wallet_id'];
+                            $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$parent_id', '$wallet_id', '$parent_moneyback', 'credit')");
+                        }
                     }else {
                         exit();
                     }    
@@ -631,7 +634,6 @@ class Customer extends BaseController
             // Redirect or display success message
             return redirect()->to(base_url('admin/purchase'))->with('success', 'Purchase added successfully');
         }
-        print_r($this->request->getMethod());
         //load the view
         $data['main_content'] = 'admin/purchase';
         return view('includes/admin/template', $data);
