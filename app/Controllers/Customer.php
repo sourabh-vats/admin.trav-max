@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controllers;
-
+use Dotenv\Dotenv;
 class Customer extends BaseController
 {
 
@@ -650,4 +650,37 @@ class Customer extends BaseController
         $data['main_content'] = 'admin/purchases';
         return view('includes/admin/template', $data);
     }
+
+    public function setting()
+    {
+        $filePath = WRITEPATH . 'custom_settings.json';
+    
+        $Data = [];
+    
+        if ($this->request->getMethod() === 'post') {
+            $userCashback = $this->request->getPost('user_cashback');
+            $parentCashback = $this->request->getPost('parent_cashback');
+    
+            $Data = [
+                'user_cashback' => $userCashback,
+                'parent_cashback' => $parentCashback,
+            ];
+    
+            file_put_contents($filePath, json_encode($Data));
+    
+            $session = session();
+            $session->setFlashdata('flash_message', 'Settings updated successfully');
+        } elseif (file_exists($filePath)) {
+            // Read the existing data from the file
+            $Data = json_decode(file_get_contents($filePath), true);
+        }
+    
+        // Pass the data to the view
+        $data['data'] = $Data;
+    
+        // Load the view
+        $data['main_content'] = 'admin/setting';
+        return view('includes/admin/template', $data);
+    }
+    
 }
