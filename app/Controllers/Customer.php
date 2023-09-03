@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controllers;
-
+use Dotenv\Dotenv;
 class Customer extends BaseController
 {
 
@@ -577,6 +577,7 @@ class Customer extends BaseController
     public function purchase()
     {
         $data['title'] = 'Purchase';
+        
         if ($this->request->getMethod() === 'post') {
             $data = [
                 'trav_id' => $this->request->getPost('trav_id'),
@@ -587,7 +588,6 @@ class Customer extends BaseController
                 'invoice' => $this->request->getPost('invoice'),
                 'cashback' => $this->request->getPost('cashback'),
             ];
-
             // Upload file and get the file name
             $document = $this->request->getFile('document');
             if ($document->isValid() && !$document->hasMoved()) {
@@ -598,7 +598,38 @@ class Customer extends BaseController
 
             // Insert data into database using model
             $user_model = model('Users_model');
-            $user_model->add_purchase($data);
+            $purchase_added = $user_model->add_purchase($data);
+
+            if ($purchase_added) {
+                $db = db_connect();
+                $user_id = $this->request->getPost('trav_id');
+                $purchase_amount = $this->request->getPost('amount');
+                $cashback = $this->request->getPost('cashback');
+                $user_cashback = $cashback * 0.40;
+                $parent_moneyback = $cashback * 0.05;
+                //user wallet updates
+                $db->query("UPDATE `wallet` SET `eligibility` = `eligibility` + '$purchase_amount' WHERE (`user_id` = '$user_id' and `wallet_type` = 'moneyback')");
+                $db->query("UPDATE `wallet` SET `balance` = `balance` + '$user_cashback' WHERE (`user_id` = '$user_id' and `wallet_type` = 'cashback')");
+                $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$user_id', (select wallet_id from wallet where user_id='$user_id' and wallet_type = 'cashback'), '$user_cashback', 'credit')");
+                //distribution
+                $parent_id = $user_id;//temparary
+                for ($i = 0; $i < 5; $i++) {
+                    $query   = $db->query('select parent_customer_id from customer where customer_id = "' . $parent_id . '"');
+                    $result = $query->getRowArray();
+                    if ($result) {
+                        $parent_id = $result['parent_customer_id'];
+                        $db->query("UPDATE `wallet` SET `balance` = `balance` + '$parent_moneyback' WHERE (`user_id` = '$parent_id' and `wallet_type` = 'moneyback')");
+                        $query = $db->query("select wallet_id from wallet where user_id='$parent_id' and wallet_type = 'moneyback'");
+                        $result = $query->getRowArray();
+                        if ($result) {
+                            $wallet_id = $result['wallet_id'];
+                            $db->query("INSERT INTO `transaction` (`user_id`, `wallet_id`, `amount`, `transaction_type`) VALUES ('$parent_id', '$wallet_id', '$parent_moneyback', 'credit')");
+                        }
+                    }else {
+                        exit();
+                    }    
+                }
+            }
 
             // Redirect or display success message
             return redirect()->to(base_url('admin/purchase'))->with('success', 'Purchase added successfully');
@@ -612,11 +643,44 @@ class Customer extends BaseController
     {
         $data['title'] = 'Purchases';
         $user_model = model('Users_model');
-        $purchases = $user_model->get_purchase_data(); 
-    
+        $purchases = $user_model->get_purchase_data();
+
         $data['purchases'] = $purchases;
         //load the view
         $data['main_content'] = 'admin/purchases';
         return view('includes/admin/template', $data);
     }
+
+    public function setting()
+    {
+        $filePath = WRITEPATH . 'custom_settings.json';
+    
+        $Data = [];
+    
+        if ($this->request->getMethod() === 'post') {
+            $userCashback = $this->request->getPost('user_cashback');
+            $parentCashback = $this->request->getPost('parent_cashback');
+    
+            $Data = [
+                'user_cashback' => $userCashback,
+                'parent_cashback' => $parentCashback,
+            ];
+    
+            file_put_contents($filePath, json_encode($Data));
+    
+            $session = session();
+            $session->setFlashdata('flash_message', 'Settings updated successfully');
+        } elseif (file_exists($filePath)) {
+            // Read the existing data from the file
+            $Data = json_decode(file_get_contents($filePath), true);
+        }
+    
+        // Pass the data to the view
+        $data['data'] = $Data;
+    
+        // Load the view
+        $data['main_content'] = 'admin/setting';
+        return view('includes/admin/template', $data);
+    }
+    
 }

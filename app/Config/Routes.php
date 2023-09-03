@@ -37,6 +37,7 @@ $routes->get('welcome', 'User::admin_welcome');
 $routes->get('admin/customer', 'Customer::index');
 $routes->match(['get', 'post'],'admin/purchase', 'Customer::purchase');
 $routes->get('admin/purchases', 'Customer::purchases');
+$routes->match(['get', 'post'],'admin/setting', 'Customer::setting');
 // $routes->get('admin/customer/add', 'Customer::add');
 $routes->match(['get', 'post'], 'admin/customer/edit/(:num)', 'Customer::update/$1');
 $routes->match(['get', 'post'], 'admin/customer/info/(:any)', 'Customer::info');

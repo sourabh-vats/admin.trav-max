@@ -6,6 +6,7 @@
      <li class="dropdown"><a href="<?php echo base_url(); ?>admin/purchase">Purchase</a></li>
      <li class="dropdown"><a href="<?php echo base_url(); ?>admin/purchases">View Purchases</a></li>
      <li class="dropdown"><a href="<?php echo base_url(); ?>admin/update_user">Update User</a></li>
+     <li class="dropdown"><a href="<?php echo base_url(); ?>admin/setting">Settings</a></li>
 
      <li class="dropdown ">
        <a data-toggle="dropdown" class="dropdown-toggle" href="<?php echo base_url(); ?>admin/customer/partners_master" aria-expanded="true"> Partners &nbsp;<i class="fa fa-angle-down"></i></a>
