@@ -28,12 +28,11 @@ function deleteConfirm(url)
           echo '</div>';          
         }
       }
-	  //print_r($restaurants);
       ?>
 
 	   <div class="table-responsive">
 <table id="example" class="table table-bordered table-hover customer-table"> 
-	<thead> <tr><th>ID</th> <th>Partner Name</th><th>Zkey ID</th><th>status</th><th>Date of Joining</th><th>Parent Name</th><th>Parent Key</th><th>City</th><th>Phone</th><th>Email</th><!-- <th>Delete</th> --> <th>View</th></tr> </thead> 
+	<thead> <tr><th>ID</th> <th>Name</th><th>TravID</th><th>Status</th><th>Date of Joining</th><th>Parent TravID</th><th>Phone</th><th>Email</th><th>Edit</th><th>View</th></tr> </thead> 
 <tbody> 
 <?php 
 $i = 1;
@@ -44,7 +43,17 @@ foreach($customer as $con){
 	else{
 		$franchisee_value='No';
 	}
-	echo '<tr><td>'.$i.'</td><td><a href="'.base_url().'admin/customer/edit/'.$con['id'].'">'.$con['f_name'].'</a></td><td>'.$con['customer_id'].'</td><td>'.$con['status'].'</td><td>'.date('Y/m/d',strtotime($con['rdate'])).'</td><td>'.$con['parent_customer_id'].'</td><td>'.$con['direct_customer_id'].'</td><td>'.$con['city'].'</td><td>'.$con['phone'].'</td><td><a href="'.base_url().'admin/customer/edit/'.$con['id'].'">'.$con['email'].'</a></td><td><a href="customer/info/'.$con['id'].'">View</a></td>';
+	echo '<tr>
+  <td>'.$i.'</td>
+  <td>'.$con['f_name'].'</a></td>
+  <td>'.$con['customer_id'].'</td>
+  <td>'.$con['status'].'</td>
+  <td>'.date('Y/m/d',strtotime($con['rdate'])).'</td>
+  <td>'.$con['parent_customer_id'].'</td>
+  <td>'.$con['phone'].'</td>
+  <td>'.$con['email'].'</td>
+  <td><a href="'.base_url().'admin/customer/edit/'.$con['id'].'">Edit</a></td>
+  <td><a href="customer/info/'.$con['id'].'">View</a></td>';
 ?> <!--
 <td><form method="post" action="<?php echo base_url(); ?>../index.php/vc_site_admin/user/super_admin_login" target="_blank" class="form form-inline">	  <p> 		  <input type="hidden" class="form-control" required value="<?php echo $con['customer_id']; ?>" name="bcono" style="height:auto;"> 		  <input type="submit" name="submit" class="btn btn-primary" value="Login">	  	  <input type="hidden" name="auth" value="<?php echo md5('@#96pp~~'.md5('AdWinAdmin'));?>">	  </p>	</form></td>- -->
 	
